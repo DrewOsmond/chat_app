@@ -1,30 +1,20 @@
-import WebSocket, { WebSocketServer } from "ws";
+import { Server } from "socket.io";
+//@ts-ignore
+import eiows from "eiows";
 
-const wss = new WebSocketServer({
-  port: 8080,
-  perMessageDeflate: {
-    zlibDeflateOptions: {
-      // See zlib defaults.
-      chunkSize: 1024,
-      memLevel: 7,
-      level: 3,
-    },
-    zlibInflateOptions: {
-      chunkSize: 10 * 1024,
-    },
-    // Other options settable:
-    clientNoContextTakeover: true, // Defaults to negotiated value.
-    serverNoContextTakeover: true, // Defaults to negotiated value.
-    serverMaxWindowBits: 10, // Defaults to negotiated value.
-    // Below options specified as default values.
-    concurrencyLimit: 10, // Limits zlib concurrency for perf.
-    threshold: 1024, // Size (in bytes) below which messages
-    // should not be compressed if context takeover is disabled.
+const io = new Server(8040, {
+  wsEngine: eiows.Server,
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
   },
 });
 
-const ws = new WebSocket("ws://www.host.com/path", {
-  perMessageDeflate: false,
-});
+io.listen(4000);
 
-ws.on("open", () => console.log("connected"));
+io.on("connection", (socket) => {
+  socket.on("message", (msg) => {
+    socket.emit("msg", msg);
+    socket.broadcast.emit("msg", msg);
+  });
+});
