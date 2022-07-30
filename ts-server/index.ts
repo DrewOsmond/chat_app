@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-//@ts-ignore
+// @ts-ignore ignoring since there are no ts types for eiows
 import eiows from "eiows";
 
 const io = new Server(8040, {
